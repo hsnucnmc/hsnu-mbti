@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MBTI Answer Page</title>
+  <link rel="stylesheet" href="./index.css" />
+  <script>
+    let db;
+    let questions = [];
+    let currentQuestionIndex = 0;
+
+    const openDB = indexedDB.open("MBTI_DB", 1);
+    openDB.onupgradeneeded = function (e) {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains("answers")) {
+        db.createObjectStore("answers", { keyPath: "questionId" });
+      }
+    };
+    openDB.onsuccess = function (e) {
+      db = e.target.result;
+      loadQuestions();
+    };
+
+    async function loadQuestions() {
+      try {
+        const res = await fetch('./question.json');
+        const raw = await res.json();
+        // Convert object into array of { id, questionType, phase, question }
+        questions = Object.entries(raw).map(([id, meta]) => ({
+          questionId: id,
+          ...meta
+        }));
+
+        renderQuestion();
+      } catch (err) {
+        console.error("Failed to load question.json:", err);
+      }
+    }
+
+    function updateProgressBar() {
+      const progressBar = document.getElementById("progress-bar");
+      const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    function renderQuestion() {
+      const container = document.getElementById("question-container");
+      container.innerHTML = ""; // clear previous content
+
+      const q = questions[currentQuestionIndex];
+      if (!q) return;
+
+      const qBox = document.createElement("div");
+      qBox.dataset.questionId = q.questionId;
+      qBox.dataset.questionType = q.questionType;
+      qBox.dataset.phase = q.phase;
+
+      const questionText = document.createElement("p");
+      questionText.className = "text-lg font-medium mb-4 text-center";
+      questionText.textContent = `(${q.questionId}) ${q.question}`;
+
+      const scaleWrapper = document.createElement("div");
+      scaleWrapper.className = "flex justify-between items-center gap-2";
+
+      const labelLeft = document.createElement("span");
+      labelLeft.className = "text-sm text-gray-600 w-20 text-left";
+      labelLeft.innerHTML = "Strongly<br>Disagree";
+
+      const labelRight = document.createElement("span");
+      labelRight.className = "text-sm text-gray-600 w-20 text-right";
+      labelRight.innerHTML = "Strongly<br>Agree";
+
+      const scaleButtons = document.createElement("div");
+      scaleButtons.className = "flex flex-1 justify-between gap-1";
+
+      // Tailwind gradient classes for each button
+      const gradientClasses = [
+        "bg-lime-400 hover:bg-lime-600 active:bg-lime-700",
+        "bg-lime-300 hover:bg-lime-500 active:bg-lime-600 ",
+        "bg-lime-200 hover:bg-lime-400 active:bg-lime-500 ",
+        "bg-yellow-200 hover:bg-yellow-400 active:bg-yellow-500 ",
+        "bg-red-300 hover:bg-red-500 active:bg-red-600",
+        "bg-red-400 hover:bg-red-600 active:bg-red-700",
+        "bg-red-500 hover:bg-red-700 active:bg-red-800",
+      ];
+
+      for (let i = 1; i <= 7; i++) {
+        const btn = document.createElement("button");
+        btn.className = `w-10 h-10 rounded-full focus:outline-none ${gradientClasses[i - 1]}`;
+        btn.setAttribute("aria-label", i);
+
+        btn.addEventListener("click", () => {
+          saveAnswer(q, i);
+          goToNext();
+        });
+        scaleButtons.appendChild(btn);
+      }
+
+      scaleWrapper.appendChild(labelLeft);
+      scaleWrapper.appendChild(scaleButtons);
+      scaleWrapper.appendChild(labelRight);
+
+      qBox.appendChild(questionText);
+      qBox.appendChild(scaleWrapper);
+      container.appendChild(qBox);
+
+      // Update progress bar
+      updateProgressBar();
+    }
+
+    function saveAnswer(questionObj, value) {
+      const answerData = {
+        questionId: questionObj.questionId,
+        questionType: questionObj.questionType,
+        phase: questionObj.phase,
+        answer: value,
+        timestamp: Date.now()
+      };
+
+      const tx = db.transaction(["answers"], "readwrite");
+      const store = tx.objectStore("answers");
+      store.put(answerData);
+    }
+
+    function goToNext() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+    }
+
+    function goToPrev() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="w-full max-w-2xl bg-white p-6 rounded-2xl shadow-lg">
+    <h1 class="text-2xl font-bold text-center mb-6">Personality Test</h1>
+    <div id="question-container" class="mb-6"></div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between">
+      <button onclick="goToPrev()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-xl">Prev</button>
+      <div class="w-[50%] bg-gray-200 rounded-full h-2.5 mt-3 flex items-center justify-items-center">
+        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+      <button onclick="goToNext()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">Next</button>
+    </div>
+  </div>
+</body>
+</html>

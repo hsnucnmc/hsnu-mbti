@@ -1,0 +1,12 @@
+{
+  "Q1": {
+    "questionType": "EI",
+    "phase": "positive",
+    "question": "Am I handsome?"
+  },
+  "Q2": {
+    "questionType": "SN",
+    "phase": "neutral",
+    "question": "I enjoy solving logical puzzles."
+  }
+}
