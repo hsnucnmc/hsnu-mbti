@@ -1,156 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MBTI Answer Page</title>
-  <link rel="stylesheet" href="./index.css" />
-  <script>
-    let db;
-    let questions = [];
-    let currentQuestionIndex = 0;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MBTI Answer Page</title>
+    <link rel="stylesheet" href="./index.css" />
+    <script>
+        let db;
+        let questions = [];
+        let currentQuestionIndex = 0;
 
-    const openDB = indexedDB.open("MBTI_DB", 1);
-    openDB.onupgradeneeded = function (e) {
-      db = e.target.result;
-      if (!db.objectStoreNames.contains("answers")) {
-        db.createObjectStore("answers", { keyPath: "questionId" });
-      }
-    };
-    openDB.onsuccess = function (e) {
-      db = e.target.result;
-      loadQuestions();
-    };
+        const openDB = indexedDB.open("MBTI_DB", 2); // Increment version to 2
+        openDB.onupgradeneeded = function (e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("answers")) {
+                db.createObjectStore("answers", { keyPath: "questionId" });
+            }
+        };
+        openDB.onsuccess = function (e) {
+            db = e.target.result;
+            loadQuestions();
+        };
 
-    async function loadQuestions() {
-      try {
-        const res = await fetch('./question.json');
-        const raw = await res.json();
-        // Convert object into array of { id, questionType, phase, question }
-        questions = Object.entries(raw).map(([id, meta]) => ({
-          questionId: id,
-          ...meta
-        }));
 
-        renderQuestion();
-      } catch (err) {
-        console.error("Failed to load question.json:", err);
-      }
-    }
+        async function loadQuestions() {
+            try {
+                const res = await fetch('./question.json');
+                const raw = await res.json();
+                // Convert object into array of { id, questionType, phase, question }
+                questions = Object.entries(raw).map(([id, meta]) => ({
+                    questionId: id,
+                    ...meta
+                }));
 
-    function updateProgressBar() {
-      const progressBar = document.getElementById("progress-bar");
-      const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-      progressBar.style.width = `${progress}%`;
-    }
+                renderQuestion();
+            } catch (err) {
+                console.error("Failed to load question.json:", err);
+            }
+        }
 
-    function renderQuestion() {
-      const container = document.getElementById("question-container");
-      container.innerHTML = ""; // clear previous content
+        function updateProgressBar() {
+            const progressBar = document.getElementById("progress-bar");
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
 
-      const q = questions[currentQuestionIndex];
-      if (!q) return;
+        function renderQuestion() {
+            const container = document.getElementById("question-container");
+            container.innerHTML = ""; // clear previous content
 
-      const qBox = document.createElement("div");
-      qBox.dataset.questionId = q.questionId;
-      qBox.dataset.questionType = q.questionType;
-      qBox.dataset.phase = q.phase;
+            const q = questions[currentQuestionIndex];
+            if (!q) return;
 
-      const questionText = document.createElement("p");
-      questionText.className = "text-lg font-medium mb-4 text-center";
-      questionText.textContent = `(${q.questionId}) ${q.question}`;
+            const qBox = document.createElement("div");
+            qBox.dataset.questionId = q.questionId;
+            qBox.dataset.questionType = q.questionType;
+            qBox.dataset.phase = q.phase;
 
-      const scaleWrapper = document.createElement("div");
-      scaleWrapper.className = "flex justify-between items-center gap-2";
+            const questionText = document.createElement("p");
+            questionText.className = "text-lg font-medium mb-4 text-center";
+            questionText.textContent = `(${q.questionId}) ${q.question}`;
 
-      const labelLeft = document.createElement("span");
-      labelLeft.className = "text-sm text-gray-600 w-20 text-left";
-      labelLeft.innerHTML = "Strongly<br>Disagree";
+            const scaleWrapper = document.createElement("div");
+            scaleWrapper.className = "flex justify-between items-center gap-2";
 
-      const labelRight = document.createElement("span");
-      labelRight.className = "text-sm text-gray-600 w-20 text-right";
-      labelRight.innerHTML = "Strongly<br>Agree";
+            const labelLeft = document.createElement("span");
+            labelLeft.className = "text-sm text-gray-600 w-20 text-left";
+            labelLeft.innerHTML = "完全同意";
 
-      const scaleButtons = document.createElement("div");
-      scaleButtons.className = "flex flex-1 justify-between gap-1";
+            const labelRight = document.createElement("span");
+            labelRight.className = "text-sm text-gray-600 w-20 text-right";
+            labelRight.innerHTML = "完全不同意";
 
-      // Tailwind gradient classes for each button
-      const gradientClasses = [
-        "bg-lime-400 hover:bg-lime-600 active:bg-lime-700",
-        "bg-lime-300 hover:bg-lime-500 active:bg-lime-600 ",
-        "bg-lime-200 hover:bg-lime-400 active:bg-lime-500 ",
-        "bg-yellow-200 hover:bg-yellow-400 active:bg-yellow-500 ",
-        "bg-red-300 hover:bg-red-500 active:bg-red-600",
-        "bg-red-400 hover:bg-red-600 active:bg-red-700",
-        "bg-red-500 hover:bg-red-700 active:bg-red-800",
-      ];
+            const scaleButtons = document.createElement("div");
+            scaleButtons.className = "flex flex-1 justify-between gap-1";
 
-      for (let i = 1; i <= 7; i++) {
-        const btn = document.createElement("button");
-        btn.className = `w-10 h-10 rounded-full focus:outline-none ${gradientClasses[i - 1]}`;
-        btn.setAttribute("aria-label", i);
+            // Tailwind gradient classes for each button
+            const gradientClasses = [
+                "bg-lime-400 hover:bg-lime-600 active:bg-lime-700",
+                "bg-lime-300 hover:bg-lime-500 active:bg-lime-600 ",
+                "bg-lime-200 hover:bg-lime-400 active:bg-lime-500 ",
+                "bg-yellow-200 hover:bg-yellow-400 active:bg-yellow-500 ",
+                "bg-red-300 hover:bg-red-500 active:bg-red-600",
+                "bg-red-400 hover:bg-red-600 active:bg-red-700",
+                "bg-red-500 hover:bg-red-700 active:bg-red-800",
+            ];
 
-        btn.addEventListener("click", () => {
-          saveAnswer(q, i);
-          goToNext();
-        });
-        scaleButtons.appendChild(btn);
-      }
+            for (let i = 1; i <= 7; i++) {
+                const btn = document.createElement("button");
+                btn.className = `w-10 h-10 rounded-full focus:outline-none ${gradientClasses[i - 1]}`;
+                btn.setAttribute("aria-label", i);
 
-      scaleWrapper.appendChild(labelLeft);
-      scaleWrapper.appendChild(scaleButtons);
-      scaleWrapper.appendChild(labelRight);
+                btn.addEventListener("click", () => {
+                    saveAnswer(q, i);
+                    goToNext();
+                });
+                scaleButtons.appendChild(btn);
+            }
 
-      qBox.appendChild(questionText);
-      qBox.appendChild(scaleWrapper);
-      container.appendChild(qBox);
+            scaleWrapper.appendChild(labelLeft);
+            scaleWrapper.appendChild(scaleButtons);
+            scaleWrapper.appendChild(labelRight);
 
-      // Update progress bar
-      updateProgressBar();
-    }
+            qBox.appendChild(questionText);
+            qBox.appendChild(scaleWrapper);
+            container.appendChild(qBox);
 
-    function saveAnswer(questionObj, value) {
-      const answerData = {
-        questionId: questionObj.questionId,
-        questionType: questionObj.questionType,
-        phase: questionObj.phase,
-        answer: value,
-        timestamp: Date.now()
-      };
+            // Update progress bar
+            updateProgressBar();
+        }
 
-      const tx = db.transaction(["answers"], "readwrite");
-      const store = tx.objectStore("answers");
-      store.put(answerData);
-    }
+        function saveAnswer(questionObj, value) {
+            const answerData = {
+                questionId: questionObj.questionId,
+                questionType: questionObj.questionType,
+                phase: questionObj.phase,
+                answer: value,
+                timestamp: Date.now()
+            };
 
-    function goToNext() {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        renderQuestion();
-      }
-    }
+            const tx = db.transaction(["answers"], "readwrite");
+            const store = tx.objectStore("answers");
+            store.put(answerData);
+        }
 
-    function goToPrev() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestion();
-      }
-    }
-  </script>
+        function goToNext() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // Check for unanswered questions
+                const transaction = db.transaction(["answers"], "readonly");
+                const objectStore = transaction.objectStore("answers");
+
+                const unansweredQuestions = [];
+                const checkAnswers = objectStore.openCursor();
+
+                checkAnswers.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        const answeredQuestionId = cursor.value.questionId;
+                        // Mark the question as answered
+                        const questionIndex = questions.findIndex(q => q.questionId === answeredQuestionId);
+                        if (questionIndex !== -1) {
+                            questions[questionIndex].answered = true;
+                        }
+                        cursor.continue();
+                    } else {
+                        // After checking all answers, find the first unanswered question
+                        const unansweredIndex = questions.findIndex(q => !q.answered);
+                        if (unansweredIndex !== -1) {
+                            alert("You have unanswered questions. Jumping to the first unanswered question.");
+                            currentQuestionIndex = unansweredIndex;
+                            renderQuestion();
+                        } else {
+                            // Prompt user to submit
+                            const confirmSubmit = confirm("You have answered all questions. Do you want to submit?");
+                            if (confirmSubmit) {
+                                submitAnswers();
+                            }
+                        }
+                    }
+                };
+
+                checkAnswers.onerror = () => {
+                    console.error("Error checking unanswered questions.");
+                    alert("An error occurred while checking unanswered questions.");
+                };
+            }
+        }
+
+        function goToPrev() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function submitAnswers() {
+            // Example: Log answers to the console or send them to a server
+            const tx = db.transaction(["answers"], "readonly");
+            const store = tx.objectStore("answers");
+            const request = store.getAll();
+
+            request.onsuccess = function () {
+                console.log("Submitted answers:", request.result);
+                alert("Your answers have been submitted successfully!");
+                // Optionally, redirect or reset the quiz
+            };
+
+            request.onerror = function () {
+                console.error("Failed to retrieve answers for submission.");
+                alert("An error occurred while submitting your answers.");
+            };
+        }
+
+        function clearDatabase() {
+            const deleteRequest = indexedDB.deleteDatabase("MBTI_DB");
+
+            deleteRequest.onsuccess = function () {
+                console.log("Database deleted successfully.");
+                alert("All data has been cleared.");
+            };
+
+            deleteRequest.onerror = function (e) {
+                console.error("Error deleting database:", e.target.error);
+                alert("An error occurred while clearing the database.");
+            };
+
+            deleteRequest.onblocked = function () {
+                console.warn("Database deletion blocked. Please close all other tabs using this database.");
+                alert("Database deletion is blocked. Close all other tabs using this database and try again.");
+            };
+        }
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-  <div class="w-full max-w-2xl bg-white p-6 rounded-2xl shadow-lg">
-    <h1 class="text-2xl font-bold text-center mb-6">Personality Test</h1>
-    <div id="question-container" class="mb-6"></div>
 
-    <!-- Navigation -->
-    <div class="flex justify-between">
-      <button onclick="goToPrev()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-xl">Prev</button>
-      <div class="w-[50%] bg-gray-200 rounded-full h-2.5 mt-3 flex items-center justify-items-center">
-        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-      </div>
-      <button onclick="goToNext()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">Next</button>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white p-6 rounded-2xl shadow-lg">
+        <h1 class="text-2xl font-bold text-center mb-6">Personality Test</h1>
+        <div id="question-container" class="mb-6"></div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between">
+            <button onclick="goToPrev()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-xl">Prev</button>
+            <div class="w-[50%] bg-gray-200 rounded-full h-2.5 mt-3 flex items-center justify-items-center">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+                    style="width: 0%"></div>
+            </div>
+            <button onclick="goToNext()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">Next</button>
+        </div>
     </div>
-  </div>
 </body>
+
 </html>
