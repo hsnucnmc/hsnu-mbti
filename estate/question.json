@@ -1,12 +1,142 @@
 {
   "Q1": {
-    "questionType": "EI",
+    "questionType": "揪/被揪",
     "phase": "positive",
-    "question": "Am I handsome?"
+    "question": "你喜歡與一群朋友呆在一起"
   },
   "Q2": {
-    "questionType": "SN",
-    "phase": "neutral",
-    "question": "I enjoy solving logical puzzles."
+    "questionType": "揪/被揪",
+    "phase": "positive",
+    "question": "你常常出門玩"
+  },
+  "Q3": {
+    "questionType": "揪/被揪",
+    "phase": "negative",
+    "question": "沒有朋友的陪伴會讓你很不安"
+  },
+  "Q4": {
+    "questionType": "揪/被揪",
+    "phase": "positive",
+    "question": "你可以與陌生人聊共同話題"
+  },
+  "Q5": {
+    "questionType": "揪/被揪",
+    "phase": "positive",
+    "question": "你在路上遇到淑麗會去找它"
+  },
+  "Q6": {
+    "questionType": "揪/被揪",
+    "phase": "positive",
+    "question": "你是個幽默的人"
+  },
+  "Q7": {
+    "questionType": "揪/被揪",
+    "phase": "positive",
+    "question": "當老師說分組時，你會主動尋找搭檔"
+  },
+  "Q8": {
+    "questionType": "訂外送/買午餐",
+    "phase": "positive",
+    "question": "已經很久沒去南/北樓買過午餐了"
+  },
+  "Q9": {
+    "questionType": "訂外送/買午餐",
+    "phase": "positive",
+    "question": "你很富有"
+  },
+  "Q10": {
+    "questionType": "訂外送/買午餐",
+    "phase": "positive",
+    "question": "午餐願意花超過100元甚至150元"
+  },
+  "Q11": {
+    "questionType": "訂外送/買午餐",
+    "phase": "positive",
+    "question": "錢能解決的問題不是問題"
+  },
+  "Q12": {
+    "questionType": "訂外送/買午餐",
+    "phase": "positive",
+    "question": "排隊讓你感到厭煩"
+  },
+  "Q13": {
+    "questionType": "卷/抱佛脚",
+    "phase": "positive",
+    "question": "每個禮拜花超多時間準備功課"
+  },
+  "Q14": {
+    "questionType": "卷/抱佛脚",
+    "phase": "positive",
+    "question": "處理事情時，你經常以自身的情感爲主要判斷依據"
+  },
+  "Q15": {
+    "questionType": "卷/抱佛脚",
+    "phase": "positive",
+    "question": "你有撰寫計劃的能力"
+  },
+  "Q16": {
+    "questionType": "卷/抱佛脚",
+    "phase": "positive",
+    "question": "大多數同學覺得你很卷"
+  },
+  "Q17": {
+    "questionType": "卷/抱佛脚",
+    "phase": "positive",
+    "question": "學習帶給你樂趣"
+  },
+  "Q18": {
+    "questionType": "卷/抱佛脚",
+    "phase": "negative",
+    "question": "平常上課常常上到一半睡著"
+  },
+  "Q19": {
+    "questionType": "卷/抱佛脚",
+    "phase": "negative",
+    "question": "你時常不準時完他人指派的任務"
+  },
+  "Q20": {
+    "questionType": "卷/抱佛脚",
+    "phase": "negative",
+    "question": "你認爲主科以外的課不重要"
+  },
+  "Q21": {
+    "questionType": "卷/抱佛脚",
+    "phase": "negative",
+    "question": "你只讀自己想讀的科目"
+  },
+  "Q22": {
+    "questionType": "卷/抱佛脚",
+    "phase": "negative",
+    "question": "你常常遲到"
+  },
+  "Q23": {
+    "questionType": "電神/被電",
+    "phase": "positive",
+    "question": "你覺得自己聰明"
+  },
+  "Q24": {
+    "questionType": "電神/被電",
+    "phase": "positive",
+    "question": "你小時候被説聰明"
+  },
+  "Q25": {
+    "questionType": "電神/被電",
+    "phase": "negative",
+    "question": "你常常發現聽不懂老師上課的内容"
+  },
+  "Q26": {
+    "questionType": "電神/被電",
+    "phase": "positive",
+    "question": "你擧得考試很輕鬆"
+  },
+  "Q27": {
+    "questionType": "電神/被電",
+    "phase": "positive",
+    "question": "你認爲成績非常重要"
+  },
+  "Q28": {
+    "questionType": "電神/被電",
+    "phase": "positive",
+    "question": "你的書包很整齊"
   }
 }
