@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div class="w-[40%] bg-lime-500 h-screen flex items-center justify-center">
+    <div class="w-[40%] bg-lime-500 h-full absolute left-0 top-0 flex items-center justify-center">
         <div id="mbti-type" class="text-9xl font-[Kumar_One_Outline]">INTJ</div>
     </div>
     <div class="w-[60%] ml-[40%] absolute right-0 top-0">
@@ -33,44 +33,126 @@
                 return;
             }
 
-            const mbtiType = Object.values(result).map(r => r.type).join(""); // Corrected variable assignment
+            const mbtiType = Object.values(result).map(r => r.type).join("");
             document.getElementById("mbti-type").textContent = mbtiType;
             document.getElementById("traits-title").textContent = `${mbtiType} 特質`;
 
-            const traits = {
-                I: ["開拓精神", "對知識的渴望", "人生如棋", "社交挫折"],
-                N: ["熱情", "創造力", "直覺", "冒險精神"],
-                D: ["效率", "便利性", "快速決策", "現代化"],
-                S: ["傳統", "細心", "穩定", "實用性"],
-                H: ["努力", "規劃", "自律", "目標導向"],
-                L: ["靈活", "隨機應變", "壓力下的表現", "創意"],
-                P: ["領導力", "自信", "影響力", "決策能力"],
-                G: ["謙虛", "學習能力", "接受建議", "團隊合作"]
+            // Define descriptions for combinations
+            const descriptions = {
+                IDHP: [
+                    "卷+電神：雖然不是天賦型，但是從小培養的習慣讓你在高中取得了電神的稱號",
+                    "揪+訂外送：99%有uber one，一到第三節下課就必然會是全班最熱門的人，但是受歡迎的小小代價就是要會討債",
+                    "揪+卷：放學後不是在圖書館就是去圖書館的路上，一周有3天以上會去自習室，通常是3人以上一起去"
+                ],
+                IDHG: [
+                    "揪+訂外送：99%有uber one，一到第三節下課就必然會是全班最熱門的人，但是受歡迎的小小代價就是要會討債",
+                    "揪+卷：放學後不是在圖書館就是去圖書館的路上，一周有3天以上會去自習室，通常是3人以上一起去",
+                    "卷+被電：如果不是因爲班上電神太多的話，是時候該審視自己讀書的方法了"
+                ],
+                IDLP: [
+                    "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
+                    "揪+訂外送：99%有uber one，一到第三節下課就必然會是全班最熱門的人，但是受歡迎的小小代價就是要會討債",
+                    "揪/抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑"
+                ],
+                ISHP: [
+                    "揪+買午餐：每次中午第一個衝出教室，只爲了快速買到午餐，對物質生活沒特別大的追求",
+                    "卷+電神：雖然不是天賦型，但是從小培養的習慣讓你在高中取得了電神的稱號",
+                    "揪+卷：放學後不是在圖書館就是去圖書館的路上，一周有3天以上會去自習室，通常是3人以上一起去"
+                ],
+                ISLP: [
+                    "揪+買午餐：每次中午第一個衝出教室，只爲了快速買到午餐，對物質生活沒特別大的追求",
+                    "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
+                    "揪+抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑"
+                ],
+                ISLG: [
+                    "揪+買午餐：每次中午第一個衝出教室，只爲了快速買到午餐，對物質生活沒特別大的追求",
+                    "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
+                    "揪+抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑"
+                ],
+                IDLG: [
+                    "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
+                    "揪+抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑",
+                    "揪+訂外送：99%有uber one，一到第三節下課就必然會是全班最熱門的人，但是受歡迎的小小代價就是要會討債"
+                ],
+                ISHG: [
+                    "揪+買午餐：每次中午第一個衝出教室，只爲了快速買到午餐，對物質生活沒特別大的追求",
+                    "揪+卷：放學後不是在圖書館就是去圖書館的路上，一周有3天以上會去自習室，通常是3人以上一起去",
+                    "卷+被電：如果不是因爲班上電神太多的話，是時候該審視自己讀書的方法了"
+                ],
+                NDHP: [
+                    "卷+電神：雖然不是天賦型，但是從小培養的習慣讓你在高中取得了電神的稱號",
+                    "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你",
+                    "被揪+卷：假日如果沒有人跟你一起出門的話，你會選擇自己一人在家讀書"
+                ],
+                NDHG: [
+                    "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你",
+                    "被揪+卷：假日如果沒有人跟你一起出門的話，你會選擇自己一人在家讀書",
+                    "卷+被電：如果不是因爲班上電神太多的話，是時候該審視自己讀書的方法了"
+                ],
+                NDLP: [
+                    "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
+                    "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你",
+                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                ],
+                NSHP: [
+                    "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
+                    "卷+電神：雖然不是天賦型，但是從小培養的習慣讓你在高中取得了電神的稱號",
+                    "被揪+卷：假日如果沒有人跟你一起出門的話，你會選擇自己一人在家讀書"
+                ],
+                NSLP: [
+                    "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
+                    "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
+                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                ],
+                NSLG: [
+                    "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
+                    "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
+                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                ],
+                NDLG: [
+                    "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
+                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來",
+                    "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你"
+                ],
+                NSHG: [
+                    "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
+                    "被揪+卷：假日如果沒有人跟你一起出門的話，你會選擇自己一人在家讀書",
+                    "卷+被電：如果不是因爲班上電神太多的話，是時候該審視自己讀書的方法了"
+                ]
             };
 
-            // Ensure traits are fetched for each type in the result
+            // Extract the 'type' values in a fixed order
+            const order = ["揪/被揪", "訂外送/買午餐", "卷/抱佛脚", "電神/被電"];
+            const code = order.map(key => result[key].type).join("");
+
+            console.log(code); // Example output: "IDHP"
+            const descriptionPoints = descriptions[code] || ["No description available for this combination."];
+
+            // Populate the traits list with bullet points
             const traitsList = document.getElementById("traits-list");
-            traitsList.innerHTML = mbtiType.split("").map(type => {
-                if (traits[type]) {
-                    return traits[type].map(trait => `<li>${trait}</li>`).join("");
-                } else {
-                    console.warn(`No traits found for type: ${type}`);
-                    return `<li>Traits not available for ${type}</li>`;
-                }
-            }).join("");
+            traitsList.innerHTML = descriptionPoints.map(point => `<li>${point}</li>`).join("");
+
+            // Map question types to colors
+            const colors = {
+                "揪/被揪": { positive: "#E6194B", negative: "#3CB44B" }, // Red / Green
+                "訂外送/買午餐": { positive: "#4363D8", negative: "#F58231" }, // Blue / Orange
+                "卷/抱佛脚": { positive: "#911EB4", negative: "#42D4F4" }, // Purple / Cyan
+                "電神/被電": { positive: "#8B4513", negative: "#fcb103" } // Yellow / Pink
+            };
 
             const resultBars = document.getElementById("result-bars");
             resultBars.innerHTML = Object.entries(result).map(([type, data]) => {
                 const percentage = ((data.score + data.maxScore) / (2 * data.maxScore)) * 100;
+                const color = colors[type] || { positive: "#3CB44B", negative: "#E6194B" }; // Default to Green/Red
                 return `
                     <div class="mb-4">
                         <div class="flex justify-between text-lg font-bold mb-2">
-                            <span class="text-green-500">${type.split("/")[0]}</span>
-                            <span class="text-red-500">${type.split("/")[1]}</span>
+                            <span style="color: ${color.positive};">${type.split("/")[0]}</span>
+                            <span style="color: ${color.negative};">${type.split("/")[1]}</span>
                         </div>
                         <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-                            <div class="bg-green-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: ${percentage}%;"></div>
-                            <div class="bg-red-500 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: ${100 - percentage}%;"></div>
+                            <div class="h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.positive}; width: ${percentage}%;"></div>
+                            <div class="h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.negative}; width: ${100 - percentage}%;"></div>
                         </div>
                         <div class="text-sm text-gray-600 mt-1">Score: ${data.score}/${data.maxScore}</div>
                     </div>
