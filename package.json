@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build src/index.html src/landing.html src/result.html --dist-dir dist && cp -r estate dist/ && cp -r estate/* dist/estate/",
+    "deploy": "firebase deploy --only hosting"
   },
   "keywords": [],
   "author": "",
