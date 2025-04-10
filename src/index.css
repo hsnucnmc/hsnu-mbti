@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumar+One+Outline&family=Noto+Sans+TC:wght@100..900&display=swap');
 @import "tailwindcss";
+
 @theme {
     --color-betterwhite: #f4efe5;
   }
