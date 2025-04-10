@@ -10,67 +10,74 @@
 
 <body>
     <div class="w-[40%] bg-lime-500 h-screen flex items-center justify-center">
-        <div class="text-9xl font-[Kumar_One_Outline]">INTJ</div>
+        <div id="mbti-type" class="text-9xl font-[Kumar_One_Outline]">INTJ</div>
     </div>
     <div class="w-[60%] ml-[40%] absolute right-0 top-0">
         <div class="w-[80%] border-6 border-amber-900 mx-[10%] my-16 p-8">
-            <div class="text-4xl font-bold mb-2">INTJ 特質</div>
-            <ul class="text-xl list-disc ml-4">
-                <li>開拓精神</li>
-                <li>對知識的渴望</li>
-                <li>人生如棋</li>
-                <li>社交挫折</li>
+            <div class="text-4xl font-bold mb-2" id="traits-title">INTJ 特質</div>
+            <ul id="traits-list" class="text-xl list-disc ml-4">
+                <!-- Traits will be dynamically populated -->
             </ul>
             <div class="text-3xl font-bold my-4">分析結果</div>
-               <!-- 揪/被揪 -->
-    <div class="mb-4">
-        <div class="flex justify-between text-lg font-bold mb-2">
-            <span class="text-green-500">揪 (Initiator)</span>
-            <span class="text-red-500">被揪 (Non-Initiator)</span>
-        </div>
-        <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-            <div class="bg-green-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 70%;">70%</div>
-            <div class="bg-red-500 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 30%;">30%</div>
+            <div id="result-bars">
+                <!-- Result bars will be dynamically populated -->
+            </div>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const result = JSON.parse(localStorage.getItem("mbtiResult"));
+            if (!result) {
+                alert("No result found. Redirecting to the quiz.");
+                window.location.href = "./index.html";
+                return;
+            }
 
-    <!-- 訂外送/買午餐 -->
-    <div class="mb-4">
-        <div class="flex justify-between text-lg font-bold mb-2">
-            <span class="text-blue-500">訂外送 (Delivery)</span>
-            <span class="text-orange-500">買午餐 (School)</span>
-        </div>
-        <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-            <div class="bg-blue-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 60%;">60%</div>
-            <div class="bg-orange-500 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 40%;">40%</div>
-        </div>
-    </div>
+            const mbtiType = Object.values(result).map(r => r.type).join(""); // Corrected variable assignment
+            document.getElementById("mbti-type").textContent = mbtiType;
+            document.getElementById("traits-title").textContent = `${mbtiType} 特質`;
 
-    <!-- 卷/抱佛脚 -->
-    <div class="mb-4">
-        <div class="flex justify-between text-lg font-bold mb-2">
-            <span class="text-purple-500">卷 (Hard-Working)</span>
-            <span class="text-indigo-500">抱佛脚 (Last-Minute)</span>
-        </div>
-        <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-            <div class="bg-purple-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 80%;">80%</div>
-            <div class="bg-indigo-500 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 20%;">20%</div>
-        </div>
-    </div>
+            const traits = {
+                I: ["開拓精神", "對知識的渴望", "人生如棋", "社交挫折"],
+                N: ["熱情", "創造力", "直覺", "冒險精神"],
+                D: ["效率", "便利性", "快速決策", "現代化"],
+                S: ["傳統", "細心", "穩定", "實用性"],
+                H: ["努力", "規劃", "自律", "目標導向"],
+                L: ["靈活", "隨機應變", "壓力下的表現", "創意"],
+                P: ["領導力", "自信", "影響力", "決策能力"],
+                G: ["謙虛", "學習能力", "接受建議", "團隊合作"]
+            };
 
-    <!-- 電神/被電 -->
-    <div class="mb-4">
-        <div class="flex justify-between text-lg font-bold mb-2">
-            <span class="text-cyan-500">電神 (Power)</span>
-            <span class="text-red-600">被電 (Get Power)</span>
-        </div>
-        <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-            <div class="bg-cyan-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 50%;">50%</div>
-            <div class="bg-red-600 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: 50%;">50%</div>
-        </div>
-    </div>
-        </div>
-    </div>
+            // Ensure traits are fetched for each type in the result
+            const traitsList = document.getElementById("traits-list");
+            traitsList.innerHTML = mbtiType.split("").map(type => {
+                if (traits[type]) {
+                    return traits[type].map(trait => `<li>${trait}</li>`).join("");
+                } else {
+                    console.warn(`No traits found for type: ${type}`);
+                    return `<li>Traits not available for ${type}</li>`;
+                }
+            }).join("");
+
+            const resultBars = document.getElementById("result-bars");
+            resultBars.innerHTML = Object.entries(result).map(([type, data]) => {
+                const percentage = ((data.score + data.maxScore) / (2 * data.maxScore)) * 100;
+                return `
+                    <div class="mb-4">
+                        <div class="flex justify-between text-lg font-bold mb-2">
+                            <span class="text-green-500">${type.split("/")[0]}</span>
+                            <span class="text-red-500">${type.split("/")[1]}</span>
+                        </div>
+                        <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
+                            <div class="bg-green-500 h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: ${percentage}%;"></div>
+                            <div class="bg-red-500 h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="width: ${100 - percentage}%;"></div>
+                        </div>
+                        <div class="text-sm text-gray-600 mt-1">Score: ${data.score}/${data.maxScore}</div>
+                    </div>
+                `;
+            }).join("");
+        });
+    </script>
 </body>
 
 </html>

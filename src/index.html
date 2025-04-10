@@ -190,15 +190,57 @@
         }
 
         function submitAnswers() {
-            // Example: Log answers to the console or send them to a server
             const tx = db.transaction(["answers"], "readonly");
             const store = tx.objectStore("answers");
             const request = store.getAll();
 
             request.onsuccess = function () {
-                console.log("Submitted answers:", request.result);
-                alert("Your answers have been submitted successfully!");
-                // Optionally, redirect or reset the quiz
+                const answers = request.result;
+
+                // Initialize a score object for each questionType
+                const scores = {};
+                const maxScores = {};
+
+                answers.forEach(answer => {
+                    const { questionType, phase, answer: value } = answer;
+
+                    if (!scores[questionType]) {
+                        scores[questionType] = 0;
+                        maxScores[questionType] = { positive: 0, negative: 0 };
+                    }
+
+                    if (phase === "positive") {
+                        scores[questionType] += value;
+                        maxScores[questionType].positive += 7; // Add max score for positive phase
+                    } else if (phase === "negative") {
+                        scores[questionType] -= value;
+                        maxScores[questionType].negative += 7; // Add max score for negative phase
+                    }
+                });
+
+                const results = {
+                    "揪/被揪": "I/N",
+                    "訂外送/買午餐": "D/S",
+                    "卷/抱佛脚": "H/L",
+                    "電神/被電": "P/G"
+                };
+
+                const finalResult = {};
+                for (const [type, score] of Object.entries(scores)) {
+                    const totalMaxScore = maxScores[type].positive + maxScores[type].negative;
+                    const threshold = maxScores[type].positive - maxScores[type].negative; // Adjust threshold dynamically
+                    finalResult[type] = {
+                        type: score > threshold ? results[type].split("/")[0] : results[type].split("/")[1],
+                        score: score,
+                        maxScore: totalMaxScore
+                    };
+                }
+
+                // Save result to localStorage
+                localStorage.setItem("mbtiResult", JSON.stringify(finalResult));
+
+                // Automatically redirect to result.html
+                window.location.href = "./result.html";
             };
 
             request.onerror = function () {
@@ -236,28 +278,25 @@
 
                 // Initialize a score object for each questionType
                 const scores = {};
-                const maxScores = {}; // To track the maximum possible score for each questionType
+                const maxScores = {};
 
                 answers.forEach(answer => {
                     const { questionType, phase, answer: value } = answer;
 
-                    // Initialize the score and max score for this questionType if it doesn't exist
                     if (!scores[questionType]) {
                         scores[questionType] = 0;
                         maxScores[questionType] = 0;
                     }
 
-                    // Add or subtract points based on the phase
                     if (phase === "positive") {
-                        scores[questionType] += value; // Add score for positive phase
-                        maxScores[questionType] += 7; // Assume max score for each question is 7
+                        scores[questionType] += value;
+                        maxScores[questionType] += 7;
                     } else if (phase === "negative") {
-                        scores[questionType] -= value; // Subtract score for negative phase
-                        maxScores[questionType] += 7; // Assume max score for each question is 7
+                        scores[questionType] -= value;
+                        maxScores[questionType] += 7;
                     }
                 });
 
-                // Determine results based on scores
                 const results = {
                     "揪/被揪": "I/N",
                     "訂外送/買午餐": "D/S",
@@ -265,15 +304,18 @@
                     "電神/被電": "P/G"
                 };
 
-                console.log("Scores and Results:");
+                const finalResult = {};
                 for (const [type, score] of Object.entries(scores)) {
                     const maxScore = maxScores[type];
-                    const threshold = maxScore / 2; // Half of the maximum score
-                    const result = score > threshold ? results[type].split("/")[0] : results[type].split("/")[1];
-                    console.log(`${type}: ${score}/${maxScore} -> ${result}`);
+                    const threshold = maxScore / 2;
+                    finalResult[type] = score > threshold ? results[type].split("/")[0] : results[type].split("/")[1];
                 }
 
-                alert("Scores have been calculated. Check the console for details.");
+                // Save result to localStorage
+                localStorage.setItem("mbtiResult", JSON.stringify(finalResult));
+
+                // Redirect to result.html
+                window.location.href = "./result.html";
             };
 
             request.onerror = function () {
