@@ -249,6 +249,26 @@
                 alert("Database deletion is blocked. Close all other tabs using this database and try again.");
             };
         }
+
+        function logDataToLoggly(data) {
+            fetch("http://logs-01.loggly.com/inputs/7a838f9a-f504-4c79-a286-db9367b959d9/tag/http/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Data logged to Loggly successfully.");
+                    } else {
+                        console.error("Failed to log data to Loggly.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error logging data to Loggly:", error);
+                });
+        }
     </script>
 </body>
 
