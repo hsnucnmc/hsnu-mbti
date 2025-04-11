@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div class="w-[40%] bg-lime-500 h-full absolute left-0 top-0 flex items-center justify-center">
+    <div class="w-[40%] bg-lime-500 h-screen absolute left-0 top-0 flex items-center justify-center">
         <div id="mbti-type" class="text-9xl font-[Kumar_One_Outline]">INTJ</div>
     </div>
     <div class="w-[60%] ml-[40%] absolute right-0 top-0">
@@ -21,6 +21,13 @@
             <div class="text-3xl font-bold my-4">分析結果</div>
             <div id="result-bars">
                 <!-- Result bars will be dynamically populated -->
+            </div>
+            <!-- Restart Button -->
+            <div class="mt-8 flex justify-center">
+                <button onclick="restartQuiz()"
+                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg">
+                    Restart Quiz
+                </button>
             </div>
         </div>
     </div>
@@ -184,6 +191,30 @@
                 `;
             }).join("");
         });
+
+        function restartQuiz() {
+            localStorage.removeItem("mbtiResult");
+            clearDatabase();
+            window.location.href = "./landing.html";
+        }
+        function clearDatabase() {
+            const deleteRequest = indexedDB.deleteDatabase("MBTI_DB");
+
+            deleteRequest.onsuccess = function () {
+                console.log("Database deleted successfully.");
+                alert("All data has been cleared.");
+            };
+
+            deleteRequest.onerror = function (e) {
+                console.error("Error deleting database:", e.target.error);
+                alert("An error occurred while clearing the database.");
+            };
+
+            deleteRequest.onblocked = function () {
+                console.warn("Database deletion blocked. Please close all other tabs using this database.");
+                alert("Database deletion is blocked. Close all other tabs using this database and try again.");
+            };
+        }
     </script>
 </body>
 
