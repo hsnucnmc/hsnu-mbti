@@ -52,7 +52,7 @@
                 IDLP: [
                     "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
                     "揪+訂外送：99%有uber one，一到第三節下課就必然會是全班最熱門的人，但是受歡迎的小小代價就是要會討債",
-                    "揪/抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑"
+                    "揪+抱佛脚：每次三排五排都少不了你的身影，你總能在上課時找到機會拉上三五好友一起開黑"
                 ],
                 ISHP: [
                     "揪+買午餐：每次中午第一個衝出教室，只爲了快速買到午餐，對物質生活沒特別大的追求",
@@ -92,7 +92,7 @@
                 NDLP: [
                     "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
                     "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你",
-                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                    "被揪+抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
                 ],
                 NSHP: [
                     "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
@@ -102,16 +102,16 @@
                 NSLP: [
                     "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
                     "抱佛脚+電神：天賦型選手，從小就沒什麽讀書，後遺症為上課不認真，常常忘記交作業或是跟別人借",
-                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                    "被揪+抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
                 ],
                 NSLG: [
                     "被揪+買午餐：可能的情況有兩種，一是由一群朋友去買午餐時會固定帶上你，二是習慣自己一個人，所以都自己買",
                     "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
-                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
+                    "被揪+抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來"
                 ],
                 NDLG: [
                     "抱佛脚+被電：常年倒數，學期末變身為學分精算師，不知道是找不到讀書的動力還是高中生活太悠閑",
-                    "被揪/抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來",
+                    "被揪+抱佛脚：雖然上課時想要專心，但是只要有人邀請，自己還是控制不住的開始玩起來",
                     "被揪+訂外送：可能是因爲說過太多次“不揪”，每到中午時只要有訂外送都會叫上你"
                 ],
                 NSHG: [
@@ -123,7 +123,27 @@
 
             // Extract the 'type' values in a fixed order
             const order = ["揪/被揪", "訂外送/買午餐", "卷/抱佛脚", "電神/被電"];
-            const code = order.map(key => result[key].type).join("");
+            const code = order.map(key => result[key]?.type || "").join("");
+            const darkColors = [
+                "#8B0000", "#556B2F", "#2F4F4F", "#483D8B",
+                "#8B008B", "#B22222", "#4B0082", "#191970",
+                "#2E8B57", "#6B8E23", "#708090", "#A0522D",
+                "#5F9EA0", "#8B4513", "#3CB371", "#9932CC"
+            ];
+
+            const mbtiCodes = [
+                "IDHP", "IDHG", "IDLP", "IDLG",
+                "ISHP", "ISHG", "ISLP", "ISLG",
+                "NDHP", "NDHG", "NDLP", "NDLG",
+                "NSHP", "NSHG", "NSLP", "NSLG"
+            ];
+
+            const codeColors = Object.fromEntries(
+                mbtiCodes.map((code, i) => [code, darkColors[i]])
+            );
+
+            const selectedColor = codeColors[mbtiType] || "#333"; // fallback
+            document.querySelector("div.w-\\[40\\%\\]").style.backgroundColor = selectedColor;
 
             console.log(code); // Example output: "IDHP"
             const descriptionPoints = descriptions[code] || ["No description available for this combination."];
@@ -142,7 +162,12 @@
 
             const resultBars = document.getElementById("result-bars");
             resultBars.innerHTML = Object.entries(result).map(([type, data]) => {
-                const percentage = ((data.score + data.maxScore) / (2 * data.maxScore)) * 100;
+                // Calculate the percentage based on the user's score relative to the max score
+                const percentage = (data.score / data.maxScore) * 100;
+
+                // Ensure the percentage is valid (fallback to 0 if NaN or invalid)
+                const validPercentage = isNaN(percentage) || percentage < 0 ? 0 : percentage;
+
                 const color = colors[type] || { positive: "#3CB44B", negative: "#E6194B" }; // Default to Green/Red
                 return `
                     <div class="mb-4">
@@ -151,8 +176,8 @@
                             <span style="color: ${color.negative};">${type.split("/")[1]}</span>
                         </div>
                         <div class="relative w-full bg-gray-300 rounded-full h-6 flex">
-                            <div class="h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.positive}; width: ${percentage}%;"></div>
-                            <div class="h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.negative}; width: ${100 - percentage}%;"></div>
+                            <div class="h-6 rounded-l-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.positive}; width: ${validPercentage}%;"></div>
+                            <div class="h-6 rounded-r-full text-white text-center text-sm leading-6 flex items-center justify-center" style="background-color: ${color.negative}; width: ${100 - validPercentage}%;"></div>
                         </div>
                         <div class="text-sm text-gray-600 mt-1">Score: ${data.score}/${data.maxScore}</div>
                     </div>

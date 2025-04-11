@@ -167,10 +167,10 @@
                             renderQuestion();
                         } else {
                             // Prompt user to submit
-                            const confirmSubmit = confirm("You have answered all questions. Do you want to submit?");
-                            if (confirmSubmit) {
+                            // const confirmSubmit = confirm("You have answered all questions. Do you want to submit?");
+                            // if (confirmSubmit) {
                                 submitAnswers();
-                            }
+                            // }
                         }
                     }
                 };
@@ -199,22 +199,24 @@
 
                 // Initialize a score object for each questionType
                 const scores = {};
-                const maxScores = {};
+                const highscores = {};
+                const lowscores = {};
 
                 answers.forEach(answer => {
                     const { questionType, phase, answer: value } = answer;
 
                     if (!scores[questionType]) {
                         scores[questionType] = 0;
-                        maxScores[questionType] = { positive: 0, negative: 0 };
+                        highscores[questionType] = 0;
+                        lowscores[questionType] = 0;
                     }
 
                     if (phase === "positive") {
                         scores[questionType] += value;
-                        maxScores[questionType].positive += 7; // Add max score for positive phase
+                        highscores[questionType] += 7;
                     } else if (phase === "negative") {
                         scores[questionType] -= value;
-                        maxScores[questionType].negative += 7; // Add max score for negative phase
+                        lowscores[questionType] += 7;
                     }
                 });
 
@@ -227,12 +229,14 @@
 
                 const finalResult = {};
                 for (const [type, score] of Object.entries(scores)) {
-                    const totalMaxScore = maxScores[type].positive + maxScores[type].negative;
-                    const threshold = maxScores[type].positive - maxScores[type].negative; // Adjust threshold dynamically
+                    const maxScore = highscores[type] + lowscores[type]; // Total max score
+                    const threshold = maxScore / 2; // Threshold is half of the max score
+                    const adjustedScore = score + lowscores[type]; // Adjust score to account for negative phase
+
                     finalResult[type] = {
-                        type: score > threshold ? results[type].split("/")[0] : results[type].split("/")[1],
-                        score: score,
-                        maxScore: totalMaxScore
+                        type: adjustedScore > threshold ? results[type].split("/")[0] : results[type].split("/")[1],
+                        score: adjustedScore,
+                        maxScore: maxScore
                     };
                 }
 
@@ -279,21 +283,26 @@
                 // Initialize a score object for each questionType
                 const scores = {};
                 const maxScores = {};
-
+                const highscores = {};
+                const lowscores = {};
                 answers.forEach(answer => {
                     const { questionType, phase, answer: value } = answer;
 
                     if (!scores[questionType]) {
                         scores[questionType] = 0;
                         maxScores[questionType] = 0;
+                        highscores[questionType] = 0;
+                        lowscores[questionType] = 0;
                     }
 
                     if (phase === "positive") {
                         scores[questionType] += value;
                         maxScores[questionType] += 7;
+                        highscores[questionType] += 7;
                     } else if (phase === "negative") {
                         scores[questionType] -= value;
-                        maxScores[questionType] += 7;
+                        maxScores[questionType] -= 7;
+                        lowscores[questionType] -= 7;
                     }
                 });
 
@@ -306,9 +315,10 @@
 
                 const finalResult = {};
                 for (const [type, score] of Object.entries(scores)) {
-                    const maxScore = maxScores[type];
+                    const maxScore = highscores[type] - lowscores[type];
                     const threshold = maxScore / 2;
-                    finalResult[type] = score > threshold ? results[type].split("/")[0] : results[type].split("/")[1];
+                    var newscore = score - lowscores[type];
+                    finalResult[type] = newscore > threshold ? results[type].split("/")[0] : results[type].split("/")[1];
                 }
 
                 // Save result to localStorage
@@ -326,8 +336,8 @@
     </script>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="w-full max-w-2xl bg-white p-6 rounded-2xl shadow-lg">
+<body class="bg-dblue min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white p-6 rounded-2xl shadow-lg scale-in-center">
     
         <div id="question-container" class="mb-6"></div>
 
