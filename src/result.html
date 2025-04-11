@@ -20,8 +20,13 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Left Section -->
-    <div id="mainleftbg" class="w-full md:w-[40%] bg-lime-500 h-48 md:h-screen flex items-center justify-center md:absolute md:left-0 md:top-0">
+    <div id="mainleftbg" class="w-full md:w-[40%] bg-lime-500 h-48 md:h-screen flex items-center justify-center md:absolute md:left-0 md:top-0 relative">
         <div id="mbti-type" class="text-5xl md:text-9xl font-[Kumar_One_Outline]">INTJ</div>
+        <!-- QR Code Section -->
+        <div class="absolute bottom-4 right-4 flex flex-col items-center">
+            <div class="text-xs md:text-sm text-betterwhite mb-2">掃描以在手機上打開</div>
+            <div id="qrcode" class="mt-2"></div>
+        </div>
     </div>
 
     <!-- Right Section -->
@@ -35,16 +40,18 @@
             <div id="result-bars">
                 <!-- Result bars will be dynamically populated -->
             </div>
-            <!-- Restart Button -->
-            <div class="mt-8 flex justify-center">
-                <button onclick="restartQuiz()"
-                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg shadow-lg text-sm md:text-base">
-                    Restart Quiz
-                </button>
-            </div>
         </div>
     </div>
 
+    <!-- Floating Restart Button -->
+    <div class="fixed bottom-4 right-4">
+        <button onclick="restartQuiz()"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg shadow-lg text-sm md:text-base">
+            Restart Quiz
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const result = JSON.parse(localStorage.getItem("mbtiResult"));
@@ -57,6 +64,19 @@
             const mbtiType = Object.values(result).map(r => r.type).join("");
             document.getElementById("mbti-type").textContent = mbtiType;
             document.getElementById("traits-title").textContent = `${mbtiType} 特質`;
+
+            // Generate QR Code for the current URL
+            const currentUrl = window.location.href;
+            const qrCodeContainer = document.getElementById("qrcode");
+
+            // Dynamically create a canvas element
+            const qrCodeCanvas = document.createElement("canvas");
+            qrCodeContainer.appendChild(qrCodeCanvas);
+
+            QRCode.toCanvas(qrCodeCanvas, currentUrl, { width: 128, height: 128 }, function (error) {
+                if (error) console.error(error);
+                console.log("QR Code generated for URL:", currentUrl);
+            });
 
             // Define descriptions for combinations
             const descriptions = {
