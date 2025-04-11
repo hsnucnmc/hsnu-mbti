@@ -5,32 +5,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./index.css" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-91GFT9ZJKW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-91GFT9ZJKW');
+    </script>
+
     <title>MBTI - HSNU MBTI?</title>
 </head>
 
-<body>
-    <div class="w-[40%] bg-lime-500 h-screen absolute left-0 top-0 flex items-center justify-center">
-        <div id="mbti-type" class="text-9xl font-[Kumar_One_Outline]">INTJ</div>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Left Section -->
+    <div id="mainleftbg" class="w-full md:w-[40%] bg-lime-500 h-48 md:h-screen flex items-center justify-center md:absolute md:left-0 md:top-0">
+        <div id="mbti-type" class="text-5xl md:text-9xl font-[Kumar_One_Outline]">INTJ</div>
     </div>
-    <div class="w-[60%] ml-[40%] absolute right-0 top-0">
-        <div class="w-[80%] border-6 border-amber-900 mx-[10%] my-16 p-8">
-            <div class="text-4xl font-bold mb-2" id="traits-title">INTJ 特質</div>
-            <ul id="traits-list" class="text-xl list-disc ml-4">
+
+    <!-- Right Section -->
+    <div class="w-full md:w-[60%] md:ml-[40%] p-4 md:absolute md:right-0 md:top-0">
+        <div class="w-full md:w-[80%] border-4 border-amber-900 mx-auto my-8 p-4 md:p-8 bg-white rounded-lg shadow-lg">
+            <div class="text-2xl md:text-4xl font-bold mb-4" id="traits-title">INTJ 特質</div>
+            <ul id="traits-list" class="text-base md:text-xl list-disc ml-4">
                 <!-- Traits will be dynamically populated -->
             </ul>
-            <div class="text-3xl font-bold my-4">分析結果</div>
+            <div class="text-xl md:text-3xl font-bold my-4">分析結果</div>
             <div id="result-bars">
                 <!-- Result bars will be dynamically populated -->
             </div>
             <!-- Restart Button -->
             <div class="mt-8 flex justify-center">
                 <button onclick="restartQuiz()"
-                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg">
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg shadow-lg text-sm md:text-base">
                     Restart Quiz
                 </button>
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const result = JSON.parse(localStorage.getItem("mbtiResult"));
@@ -150,7 +164,7 @@
             );
 
             const selectedColor = codeColors[mbtiType] || "#333"; // fallback
-            document.querySelector("div.w-\\[40\\%\\]").style.backgroundColor = selectedColor;
+            document.getElementById("mainleftbg").style.backgroundColor = selectedColor;
 
             console.log(code); // Example output: "IDHP"
             const descriptionPoints = descriptions[code] || ["No description available for this combination."];
